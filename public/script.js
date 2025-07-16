@@ -4,6 +4,8 @@ const API_BASE_URL = 'http://localhost:3000/api';
 // Estado da aplicação
 let currentEditingId = null;
 let sprints = [];
+let lastTwoSprintsChart = null;
+let globalChart = null;
 
 // Elementos DOM
 const elements = {
@@ -20,12 +22,45 @@ const elements = {
     confirmModal: document.getElementById('confirmModal'),
     confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
     cancelDeleteBtn: document.getElementById('cancelDeleteBtn'),
-    toast: document.getElementById('toast')
+    toast: document.getElementById('toast'),
+    // Dashboard elements
+    dashboardTab: document.getElementById('dashboardTab'),
+    manageTab: document.getElementById('manageTab'),
+    dashboardSection: document.getElementById('dashboardSection'),
+    manageSection: document.getElementById('manageSection'),
+    dashboardAssigneeId: document.getElementById('dashboardAssigneeId'),
+    loadDashboardBtn: document.getElementById('loadDashboardBtn'),
+    chartsContainer: document.getElementById('chartsContainer'),
+    emptyDashboard: document.getElementById('emptyDashboard'),
+    totalSprintsCount: document.getElementById('totalSprintsCount'),
+    avgProductivity: document.getElementById('avgProductivity'),
+    avgAccuracy: document.getElementById('avgAccuracy')
 };
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded');
+    
+    // Verificar se todos os elementos críticos existem
+    const criticalElements = [
+        'dashboardTab', 'manageTab', 
+        'dashboardSection', 'manageSection'
+    ];
+    
+    let missingElements = [];
+    criticalElements.forEach(elementName => {
+        const element = document.getElementById(elementName);
+        if (!element) {
+            missingElements.push(elementName);
+        }
+    });
+    
+    if (missingElements.length > 0) {
+        console.error('Elementos não encontrados:', missingElements);
+    }
+    
     initializeEventListeners();
+    initializeTabs();
     loadSprints();
 });
 
@@ -38,9 +73,21 @@ function initializeEventListeners() {
     elements.cancelBtn.addEventListener('click', resetForm);
     elements.confirmDeleteBtn.addEventListener('click', confirmDelete);
     elements.cancelDeleteBtn.addEventListener('click', closeModal);
+    
+    // Dashboard events
+    elements.dashboardTab.addEventListener('click', () => switchTab('dashboard'));
+    elements.manageTab.addEventListener('click', () => switchTab('manage'));
+    elements.loadDashboardBtn.addEventListener('click', loadDashboard);
+    
     elements.searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             handleSearch();
+        }
+    });
+
+    elements.dashboardAssigneeId.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            loadDashboard();
         }
     });
 
@@ -398,6 +445,238 @@ function showToast(message, type = 'info') {
     setTimeout(() => {
         elements.toast.classList.remove('show');
     }, 4000);
+}
+
+// === DASHBOARD FUNCTIONS ===
+
+function initializeTabs() {
+    // Verificar se todos os elementos existem antes de configurar as abas
+    if (elements.dashboardTab && elements.manageTab && 
+        elements.dashboardSection && elements.manageSection) {
+        // Iniciar com a aba de gerenciamento para testar o CRUD
+        switchTab('manage');
+    } else {
+        console.error('Elementos de navegação não encontrados');
+    }
+}
+
+function switchTab(tab) {
+    if (tab === 'dashboard') {
+        if (elements.dashboardTab) elements.dashboardTab.classList.add('active');
+        if (elements.manageTab) elements.manageTab.classList.remove('active');
+        if (elements.dashboardSection) elements.dashboardSection.classList.add('active');
+        if (elements.manageSection) elements.manageSection.classList.remove('active');
+    } else if (tab === 'manage') {
+        if (elements.manageTab) elements.manageTab.classList.add('active');
+        if (elements.dashboardTab) elements.dashboardTab.classList.remove('active');
+        if (elements.manageSection) elements.manageSection.classList.add('active');
+        if (elements.dashboardSection) elements.dashboardSection.classList.remove('active');
+    }
+}
+
+async function loadDashboard() {
+    const assigneeId = elements.dashboardAssigneeId.value.trim();
+    
+    if (!assigneeId) {
+        showToast('Por favor, digite um Assignee ID', 'error');
+        return;
+    }
+
+    try {
+        elements.emptyDashboard.style.display = 'none';
+        elements.chartsContainer.style.display = 'none';
+        
+        // Mostrar loading
+        showToast('Carregando dados do dashboard...', 'info');
+        
+        const response = await apiRequest(`/sprints/dashboard/${assigneeId}`);
+        const data = response.data;
+        
+        // Atualizar estatísticas
+        updateStats(data);
+        
+        // Criar gráficos
+        createCharts(data);
+        
+        // Mostrar container dos gráficos
+        elements.chartsContainer.style.display = 'block';
+        
+        showToast('Dashboard carregado com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao carregar dashboard:', error);
+        showToast(error.message || 'Erro ao carregar dashboard', 'error');
+        elements.emptyDashboard.style.display = 'block';
+        elements.chartsContainer.style.display = 'none';
+    }
+}
+
+function updateStats(data) {
+    elements.totalSprintsCount.textContent = data.totalSprints;
+    
+    // Calcular média geral de produtividade
+    const avgProd = Math.round(
+        (data.globalAverages.productivity.factory + 
+         data.globalAverages.productivity.sustain + 
+         data.globalAverages.productivity.bi) / 3
+    );
+    
+    // Calcular média geral de acurácia
+    const avgAcc = Math.round(
+        (data.globalAverages.accuracy.factory + 
+         data.globalAverages.accuracy.sustain + 
+         data.globalAverages.accuracy.bi) / 3
+    );
+    
+    elements.avgProductivity.textContent = `${avgProd}%`;
+    elements.avgAccuracy.textContent = `${avgAcc}%`;
+}
+
+function createCharts(data) {
+    // Destruir gráficos existentes
+    if (lastTwoSprintsChart) {
+        lastTwoSprintsChart.destroy();
+    }
+    if (globalChart) {
+        globalChart.destroy();
+    }
+    
+    // Configuração comum dos gráficos
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                    callback: function(value) {
+                        return value + '%';
+                    }
+                }
+            }
+        }
+    };
+    
+    // Gráfico das últimas 2 sprints
+    createLastTwoSprintsChart(data.lastTwoSprints, commonOptions);
+    
+    // Gráfico global
+    createGlobalChart(data.globalAverages, commonOptions);
+}
+
+function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
+    const ctx = document.getElementById('lastTwoSprintsChart').getContext('2d');
+    
+    // Preparar dados
+    const labels = ['Factory', 'Sustain', 'BI'];
+    const datasets = [];
+    
+    lastTwoSprints.forEach((sprint, index) => {
+        const sprintLabel = `Sprint ${sprint.sprintNumber}`;
+        const productivityColor = index === 0 ? 'rgba(102, 126, 234, 0.8)' : 'rgba(118, 75, 162, 0.8)';
+        const accuracyColor = index === 0 ? 'rgba(102, 126, 234, 0.4)' : 'rgba(118, 75, 162, 0.4)';
+        
+        // Produtividade
+        datasets.push({
+            label: `${sprintLabel} - Produtividade`,
+            data: [
+                sprint.productivity?.factory || 0,
+                sprint.productivity?.sustain || 0,
+                sprint.productivity?.bi || 0
+            ],
+            backgroundColor: productivityColor,
+            borderColor: productivityColor.replace('0.8', '1'),
+            borderWidth: 2
+        });
+        
+        // Acurácia
+        datasets.push({
+            label: `${sprintLabel} - Acurácia`,
+            data: [
+                sprint.accuracy?.factory || 0,
+                sprint.accuracy?.sustain || 0,
+                sprint.accuracy?.bi || 0
+            ],
+            backgroundColor: accuracyColor,
+            borderColor: accuracyColor.replace('0.4', '1'),
+            borderWidth: 2
+        });
+    });
+    
+    lastTwoSprintsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                title: {
+                    display: true,
+                    text: 'Comparação das Últimas 2 Sprints'
+                }
+            }
+        }
+    });
+}
+
+function createGlobalChart(globalAverages, commonOptions) {
+    const ctx = document.getElementById('globalChart').getContext('2d');
+    
+    const labels = ['Factory', 'Sustain', 'BI'];
+    
+    globalChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Produtividade Média',
+                    data: [
+                        globalAverages.productivity.factory,
+                        globalAverages.productivity.sustain,
+                        globalAverages.productivity.bi
+                    ],
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Acurácia Média',
+                    data: [
+                        globalAverages.accuracy.factory,
+                        globalAverages.accuracy.sustain,
+                        globalAverages.accuracy.bi
+                    ],
+                    backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                    borderColor: 'rgba(118, 75, 162, 1)',
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                title: {
+                    display: true,
+                    text: 'Médias Globais de Todas as Sprints'
+                }
+            }
+        }
+    });
+}
+
+async function getDashboardData(assigneeId) {
+    return await apiRequest(`/sprints/dashboard/${assigneeId}`);
 }
 
 // Função para verificar se a API está disponível

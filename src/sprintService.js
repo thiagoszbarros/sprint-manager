@@ -226,6 +226,102 @@ class SprintService {
 
     return validatedData;
   }
+
+  // Buscar dados para dashboard
+  async getDashboardData(assigneeId) {
+    try {
+      // Buscar todos os sprints do assignee
+      const allSprints = await this.getSprintsByAssignee(assigneeId);
+      
+      if (allSprints.length === 0) {
+        throw new Error('Nenhum sprint encontrado para este assignee');
+      }
+
+      // Ordenar por número da sprint (assumindo que números maiores são mais recentes)
+      const sortedSprints = allSprints.sort((a, b) => b.sprintNumber - a.sprintNumber);
+      
+      // Pegar as últimas 2 sprints
+      const lastTwoSprints = sortedSprints.slice(0, 2);
+      
+      // Calcular médias globais
+      const globalAverages = this.calculateGlobalAverages(allSprints);
+      
+      return {
+        lastTwoSprints,
+        globalAverages,
+        totalSprints: allSprints.length,
+        assigneeId
+      };
+    } catch (error) {
+      console.error('Erro ao buscar dados do dashboard:', error);
+      throw error;
+    }
+  }
+
+  // Calcular médias globais
+  calculateGlobalAverages(sprints) {
+    if (sprints.length === 0) {
+      return {
+        productivity: { factory: 0, sustain: 0, bi: 0 },
+        accuracy: { factory: 0, sustain: 0, bi: 0 }
+      };
+    }
+
+    const totals = {
+      productivity: { factory: 0, sustain: 0, bi: 0, count: { factory: 0, sustain: 0, bi: 0 } },
+      accuracy: { factory: 0, sustain: 0, bi: 0, count: { factory: 0, sustain: 0, bi: 0 } }
+    };
+
+    sprints.forEach(sprint => {
+      // Produtividade
+      if (sprint.productivity) {
+        if (sprint.productivity.factory !== undefined && sprint.productivity.factory !== null) {
+          totals.productivity.factory += sprint.productivity.factory;
+          totals.productivity.count.factory++;
+        }
+        if (sprint.productivity.sustain !== undefined && sprint.productivity.sustain !== null) {
+          totals.productivity.sustain += sprint.productivity.sustain;
+          totals.productivity.count.sustain++;
+        }
+        if (sprint.productivity.bi !== undefined && sprint.productivity.bi !== null) {
+          totals.productivity.bi += sprint.productivity.bi;
+          totals.productivity.count.bi++;
+        }
+      }
+
+      // Acurácia
+      if (sprint.accuracy) {
+        if (sprint.accuracy.factory !== undefined && sprint.accuracy.factory !== null) {
+          totals.accuracy.factory += sprint.accuracy.factory;
+          totals.accuracy.count.factory++;
+        }
+        if (sprint.accuracy.sustain !== undefined && sprint.accuracy.sustain !== null) {
+          totals.accuracy.sustain += sprint.accuracy.sustain;
+          totals.accuracy.count.sustain++;
+        }
+        if (sprint.accuracy.bi !== undefined && sprint.accuracy.bi !== null) {
+          totals.accuracy.bi += sprint.accuracy.bi;
+          totals.accuracy.count.bi++;
+        }
+      }
+    });
+
+    // Calcular médias
+    const averages = {
+      productivity: {
+        factory: totals.productivity.count.factory > 0 ? Math.round(totals.productivity.factory / totals.productivity.count.factory) : 0,
+        sustain: totals.productivity.count.sustain > 0 ? Math.round(totals.productivity.sustain / totals.productivity.count.sustain) : 0,
+        bi: totals.productivity.count.bi > 0 ? Math.round(totals.productivity.bi / totals.productivity.count.bi) : 0
+      },
+      accuracy: {
+        factory: totals.accuracy.count.factory > 0 ? Math.round(totals.accuracy.factory / totals.accuracy.count.factory) : 0,
+        sustain: totals.accuracy.count.sustain > 0 ? Math.round(totals.accuracy.sustain / totals.accuracy.count.sustain) : 0,
+        bi: totals.accuracy.count.bi > 0 ? Math.round(totals.accuracy.bi / totals.accuracy.count.bi) : 0
+      }
+    };
+
+    return averages;
+  }
 }
 
 module.exports = new SprintService();

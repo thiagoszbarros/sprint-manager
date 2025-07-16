@@ -131,4 +131,21 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// GET /api/sprints/dashboard/:assigneeId - Dados para dashboard
+router.get('/dashboard/:assigneeId', async (req, res) => {
+  try {
+    const dashboardData = await sprintService.getDashboardData(req.params.assigneeId);
+    res.json({
+      success: true,
+      data: dashboardData
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao buscar dados do dashboard',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
