@@ -361,7 +361,7 @@ function createSprintCard(sprint) {
             <div class="sprint-header">
                 <div class="sprint-info">
                     <h3><i class="fas fa-rocket"></i> ${sprint.name}</h3>
-                    <p><strong>Sprint:</strong> ${sprint.sprint} | <strong>Assignee:</strong> ${sprint.assignee_id}</p>
+                    <p><strong>Sprint:</strong> ${sprint.sprint} | <strong>Responsável:</strong> ${sprint.assignee_id}</p>
                 </div>
                 <div class="sprint-actions">
                     <button class="btn btn-edit" onclick="handleEdit('${sprint._id}')">
@@ -378,13 +378,13 @@ function createSprintCard(sprint) {
                     <h4><i class="fas fa-chart-line"></i> Produtividade</h4>
                     <div class="metric-items">
                         <div class="metric-item">
-                            <span>Factory:</span>
+                            <span>Fábrica:</span>
                             <span class="metric-value ${sprint.productivity?.factory === null ? 'null' : ''}">
                                 ${formatValue(sprint.productivity?.factory)}
                             </span>
                         </div>
                         <div class="metric-item">
-                            <span>Sustain:</span>
+                            <span>Sustentação:</span>
                             <span class="metric-value ${sprint.productivity?.sustain === null ? 'null' : ''}">
                                 ${formatValue(sprint.productivity?.sustain)}
                             </span>
@@ -396,19 +396,19 @@ function createSprintCard(sprint) {
                             </span>
                         </div>
                     </div>
-                </div>
-                
+                </div> 
+                <!-- Acurácia 
                 <div class="metric-group">
                     <h4><i class="fas fa-bullseye"></i> Acurácia</h4>
                     <div class="metric-items">
                         <div class="metric-item">
-                            <span>Factory:</span>
+                            <span>Fábrica:</span>
                             <span class="metric-value ${sprint.accuracy?.factory === null ? 'null' : ''}">
                                 ${formatValue(sprint.accuracy?.factory)}
                             </span>
                         </div>
                         <div class="metric-item">
-                            <span>Sustain:</span>
+                            <span>Sustentação:</span>
                             <span class="metric-value ${sprint.accuracy?.sustain === null ? 'null' : ''}">
                                 ${formatValue(sprint.accuracy?.sustain)}
                             </span>
@@ -421,6 +421,7 @@ function createSprintCard(sprint) {
                         </div>
                     </div>
                 </div>
+                -->
             </div>
         </div>
     `;
@@ -574,7 +575,7 @@ function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
     const ctx = document.getElementById('lastTwoSprintsChart').getContext('2d');
     
     // Preparar dados
-    const labels = ['Factory', 'Sustain', 'BI'];
+    const labels = ['Fábrica', 'Sustentação', 'BI'];
     const datasets = [];
     
     lastTwoSprints.forEach((sprint, index) => {
