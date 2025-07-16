@@ -74,8 +74,8 @@ function initializeEventListeners() {
     elements.clearSearchBtn.addEventListener('click', handleClearSearch);
     elements.addSprintBtn.addEventListener('click', openFormModal);
     elements.refreshBtn.addEventListener('click', loadSprints);
-    elements.cancelBtn.addEventListener('click', closeFormModal);
-    elements.closeFormModal.addEventListener('click', closeFormModal);
+    elements.cancelBtn.addEventListener('click', cancelFormModal);
+    elements.closeFormModal.addEventListener('click', cancelFormModal);
     elements.confirmDeleteBtn.addEventListener('click', confirmDelete);
     elements.cancelDeleteBtn.addEventListener('click', closeModal);
     
@@ -106,7 +106,7 @@ function initializeEventListeners() {
     // Fechar modal do formulário ao clicar fora
     elements.sprintFormModal.addEventListener('click', function(e) {
         if (e.target === elements.sprintFormModal) {
-            closeFormModal();
+            cancelFormModal();
         }
     });
 }
@@ -232,6 +232,11 @@ function openFormModal() {
 
 function closeFormModal() {
     elements.sprintFormModal.classList.remove('show');
+    // Não chamar resetForm aqui para preservar o currentEditingId durante a edição
+}
+
+function cancelFormModal() {
+    elements.sprintFormModal.classList.remove('show');
     resetForm();
 }
 
@@ -239,19 +244,21 @@ function openEditModal(sprint) {
     // Preencher formulário com dados do sprint
     document.getElementById('assigneeId').value = sprint.assignee_id;
     document.getElementById('sprintName').value = sprint.name;
-    document.getElementById('sprintNumber').value = sprint.sprint_number;
+    document.getElementById('sprintNumber').value = sprint.sprint;
     
     // Preencher produtividade
-    document.getElementById('productivityFactory').value = sprint.productivity_factory || '';
-    document.getElementById('productivitySustain').value = sprint.productivity_sustain || '';
-    document.getElementById('productivityBi').value = sprint.productivity_bi || '';
+    document.getElementById('productivityFactory').value = sprint.productivity?.factory || '';
+    document.getElementById('productivitySustain').value = sprint.productivity?.sustain || '';
+    document.getElementById('productivityBi').value = sprint.productivity?.bi || '';
     
     // Preencher acurácia
-    document.getElementById('accuracyFactory').value = sprint.accuracy_factory || '';
-    document.getElementById('accuracySustain').value = sprint.accuracy_sustain || '';
-    document.getElementById('accuracyBi').value = sprint.accuracy_bi || '';
+    document.getElementById('accuracyFactory').value = sprint.accuracy?.factory || '';
+    document.getElementById('accuracySustain').value = sprint.accuracy?.sustain || '';
+    document.getElementById('accuracyBi').value = sprint.accuracy?.bi || '';
     
-    currentEditingId = sprint.id;
+    currentEditingId = sprint._id;
+    console.log('currentEditingId definido como:', currentEditingId);
+    
     elements.formTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Sprint';
     elements.cancelBtn.style.display = 'inline-block';
     elements.sprintFormModal.classList.add('show');
@@ -260,6 +267,9 @@ function openEditModal(sprint) {
 // Handlers de eventos
 async function handleFormSubmit(e) {
     e.preventDefault();
+    
+    console.log('Iniciando submit do formulário');
+    console.log('currentEditingId:', currentEditingId);
     
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalContent = submitBtn.innerHTML;
@@ -271,7 +281,8 @@ async function handleFormSubmit(e) {
 
         const formData = getFormData();
 
-        let result;
+
+
         if (currentEditingId) {
             result = await updateSprint(currentEditingId, formData);
             showToast('Sprint atualizado com sucesso!', 'success');
@@ -280,7 +291,10 @@ async function handleFormSubmit(e) {
             showToast('Sprint criado com sucesso!', 'success');
         }
 
-        closeFormModal();
+        // Fechar modal e resetar apenas após sucesso
+        elements.sprintFormModal.classList.remove('show');
+        resetForm();
+
         await loadSprints();
 
     } catch (error) {
