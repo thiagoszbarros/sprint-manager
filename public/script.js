@@ -14,12 +14,15 @@ const elements = {
     searchInput: document.getElementById('searchInput'),
     searchBtn: document.getElementById('searchBtn'),
     clearSearchBtn: document.getElementById('clearSearchBtn'),
+    addSprintBtn: document.getElementById('addSprintBtn'),
     refreshBtn: document.getElementById('refreshBtn'),
     cancelBtn: document.getElementById('cancelBtn'),
     sprintsList: document.getElementById('sprintsList'),
     loadingSpinner: document.getElementById('loadingSpinner'),
     noSprintsMessage: document.getElementById('noSprintsMessage'),
     confirmModal: document.getElementById('confirmModal'),
+    sprintFormModal: document.getElementById('sprintFormModal'),
+    closeFormModal: document.getElementById('closeFormModal'),
     confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
     cancelDeleteBtn: document.getElementById('cancelDeleteBtn'),
     toast: document.getElementById('toast'),
@@ -69,8 +72,10 @@ function initializeEventListeners() {
     elements.form.addEventListener('submit', handleFormSubmit);
     elements.searchBtn.addEventListener('click', handleSearch);
     elements.clearSearchBtn.addEventListener('click', handleClearSearch);
+    elements.addSprintBtn.addEventListener('click', openFormModal);
     elements.refreshBtn.addEventListener('click', loadSprints);
-    elements.cancelBtn.addEventListener('click', resetForm);
+    elements.cancelBtn.addEventListener('click', closeFormModal);
+    elements.closeFormModal.addEventListener('click', closeFormModal);
     elements.confirmDeleteBtn.addEventListener('click', confirmDelete);
     elements.cancelDeleteBtn.addEventListener('click', closeModal);
     
@@ -95,6 +100,13 @@ function initializeEventListeners() {
     elements.confirmModal.addEventListener('click', function(e) {
         if (e.target === elements.confirmModal) {
             closeModal();
+        }
+    });
+
+    // Fechar modal do formulário ao clicar fora
+    elements.sprintFormModal.addEventListener('click', function(e) {
+        if (e.target === elements.sprintFormModal) {
+            closeFormModal();
         }
     });
 }
@@ -211,6 +223,40 @@ function resetForm() {
     elements.cancelBtn.style.display = 'none';
 }
 
+// Funções do modal do formulário
+function openFormModal() {
+    resetForm();
+    elements.sprintFormModal.classList.add('show');
+    elements.cancelBtn.style.display = 'inline-block';
+}
+
+function closeFormModal() {
+    elements.sprintFormModal.classList.remove('show');
+    resetForm();
+}
+
+function openEditModal(sprint) {
+    // Preencher formulário com dados do sprint
+    document.getElementById('assigneeId').value = sprint.assignee_id;
+    document.getElementById('sprintName').value = sprint.name;
+    document.getElementById('sprintNumber').value = sprint.sprint_number;
+    
+    // Preencher produtividade
+    document.getElementById('productivityFactory').value = sprint.productivity_factory || '';
+    document.getElementById('productivitySustain').value = sprint.productivity_sustain || '';
+    document.getElementById('productivityBi').value = sprint.productivity_bi || '';
+    
+    // Preencher acurácia
+    document.getElementById('accuracyFactory').value = sprint.accuracy_factory || '';
+    document.getElementById('accuracySustain').value = sprint.accuracy_sustain || '';
+    document.getElementById('accuracyBi').value = sprint.accuracy_bi || '';
+    
+    currentEditingId = sprint.id;
+    elements.formTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Sprint';
+    elements.cancelBtn.style.display = 'inline-block';
+    elements.sprintFormModal.classList.add('show');
+}
+
 // Handlers de eventos
 async function handleFormSubmit(e) {
     e.preventDefault();
@@ -234,7 +280,7 @@ async function handleFormSubmit(e) {
             showToast('Sprint criado com sucesso!', 'success');
         }
 
-        resetForm();
+        closeFormModal();
         await loadSprints();
 
     } catch (error) {
@@ -277,15 +323,7 @@ function handleClearSearch() {
 function handleEdit(id) {
     const sprint = sprints.find(s => s._id === id);
     if (sprint) {
-        fillForm(sprint);
-        currentEditingId = id;
-        elements.formTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Sprint';
-        elements.cancelBtn.style.display = 'inline-flex';
-        
-        // Scroll para o formulário
-        document.querySelector('.form-section').scrollIntoView({ 
-            behavior: 'smooth' 
-        });
+        openEditModal(sprint);
     }
 }
 

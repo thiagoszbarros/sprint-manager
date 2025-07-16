@@ -10,10 +10,7 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1><i class="fas fa-rocket"></i> Sprint Manager</h1>
-            <p>Gerencie seus dados de sprints de forma eficiente</p>
-            
+        <header>            
             <!-- Navegação -->
             <nav class="nav-tabs">
                 <button id="dashboardTab" class="tab-btn active">
@@ -105,14 +102,46 @@
                 <button id="clearSearchBtn" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Limpar
                 </button>
+                <button id="addSprintBtn" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Novo Sprint
+                </button>
             </div>
         </div>
 
-        <!-- Formulário de Sprint -->
-        <div class="form-section">
-            <h2 id="formTitle">
-                <i class="fas fa-plus"></i> Novo Sprint
-            </h2>
+        <!-- Lista de Sprints -->
+        <div class="sprints-section">
+            <div class="section-header">
+                <h2><i class="fas fa-list"></i> Lista de Sprints</h2>
+                <button id="refreshBtn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Atualizar
+                </button>
+            </div>
+            
+            <div id="sprintsContainer">
+                <div id="loadingSpinner" class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando...
+                </div>
+                <div id="sprintsList"></div>
+                <div id="noSprintsMessage" class="no-data" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <p>Nenhum sprint encontrado</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Modal do Formulário de Sprint -->
+    <div id="sprintFormModal" class="modal">
+        <div class="modal-content form-modal">
+            <div class="modal-header">
+                <h3 id="formTitle">
+                    <i class="fas fa-plus"></i> Novo Sprint
+                </h3>
+                <button class="close-modal" id="closeFormModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
             
             <form id="sprintForm">
                 <div class="form-row">
@@ -138,38 +167,40 @@
                     </div>
                 </div>
 
-                <div class="metrics-section">
-                    <h3><i class="fas fa-chart-line"></i> Produtividade</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="productivityFactory">Fábrica</label>
-                            <input type="number" id="productivityFactory" min="0" max="100">
-                        </div>
-                        <div class="form-group">
-                            <label for="productivitySustain">Sustentação</label>
-                            <input type="number" id="productivitySustain" min="0" max="100">
-                        </div>
-                        <div class="form-group">
-                            <label for="productivityBi">BI</label>
-                            <input type="number" id="productivityBi" min="0" max="100">
+                <div class="metrics-container">
+                    <div class="metrics-section">
+                        <h3><i class="fas fa-chart-line"></i> Produtividade</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="productivityFactory">Fábrica</label>
+                                <input type="number" id="productivityFactory" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="productivitySustain">Sustentação</label>
+                                <input type="number" id="productivitySustain" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="productivityBi">BI</label>
+                                <input type="number" id="productivityBi" min="0" max="100">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="metrics-section">
-                    <h3><i class="fas fa-bullseye"></i> Acurácia</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="accuracyFactory">Fábrica</label>
-                            <input type="number" id="accuracyFactory" min="0" max="100">
-                        </div>
-                        <div class="form-group">
-                            <label for="accuracySustain">Sustentação</label>
-                            <input type="number" id="accuracySustain" min="0" max="100">
-                        </div>
-                        <div class="form-group">
-                            <label for="accuracyBi">BI</label>
-                            <input type="number" id="accuracyBi" min="0" max="100">
+                    <div class="metrics-section">
+                        <h3><i class="fas fa-bullseye"></i> Acurácia</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="accuracyFactory">Fábrica</label>
+                                <input type="number" id="accuracyFactory" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="accuracySustain">Sustentação</label>
+                                <input type="number" id="accuracySustain" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="accuracyBi">BI</label>
+                                <input type="number" id="accuracyBi" min="0" max="100">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -183,28 +214,6 @@
                     </button>
                 </div>
             </form>
-        </div>
-
-        <!-- Lista de Sprints -->
-        <div class="sprints-section">
-            <div class="section-header">
-                <h2><i class="fas fa-list"></i> Lista de Sprints</h2>
-                <button id="refreshBtn" class="btn btn-primary">
-                    <i class="fas fa-sync-alt"></i> Atualizar
-                </button>
-            </div>
-            
-            <div id="sprintsContainer">
-                <div id="loadingSpinner" class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> Carregando...
-                </div>
-                <div id="sprintsList"></div>
-                <div id="noSprintsMessage" class="no-data" style="display: none;">
-                    <i class="fas fa-inbox"></i>
-                    <p>Nenhum sprint encontrado</p>
-                </div>
-            </div>
-        </div>
         </div>
     </div>
 
