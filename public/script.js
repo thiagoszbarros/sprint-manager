@@ -407,6 +407,8 @@ function displaySprints(sprintsToShow) {
 
 function createSprintCard(sprint) {
     const formatValue = (value) => value !== null && value !== undefined ? value : 'N/A';
+    const formatPercentage = (value) => value !== null && value !== undefined ? `${value}%` : 'N/A';
+    const getProgressWidth = (value) => value !== null && value !== undefined ? value : 0;
     
     return `
         <div class="sprint-card">
@@ -433,51 +435,74 @@ function createSprintCard(sprint) {
                 <div class="metric-group">
                     <h4><i class="fas fa-chart-line"></i> Produtividade</h4>
                     <div class="metric-items">
-                        <div class="metric-item">
-                            <span>Fábrica:</span>
-                            <span class="metric-value ${sprint.productivity?.factory === null ? 'null' : ''}">
-                                ${formatValue(sprint.productivity?.factory)}
-                            </span>
+                        <div class="metric-item-progress">
+                            <div class="metric-label">
+                                <span>Fábrica</span>
+                                <span class="metric-percentage">${formatPercentage(sprint.productivity?.factory)}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${sprint.productivity?.factory === null ? 'null' : ''}" 
+                                     style="width: ${getProgressWidth(sprint.productivity?.factory)}%"></div>
+                            </div>
                         </div>
-                        <div class="metric-item">
-                            <span>Sustentação:</span>
-                            <span class="metric-value ${sprint.productivity?.sustain === null ? 'null' : ''}">
-                                ${formatValue(sprint.productivity?.sustain)}
-                            </span>
+                        <div class="metric-item-progress">
+                            <div class="metric-label">
+                                <span>Sustentação</span>
+                                <span class="metric-percentage">${formatPercentage(sprint.productivity?.sustain)}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${sprint.productivity?.sustain === null ? 'null' : ''}" 
+                                     style="width: ${getProgressWidth(sprint.productivity?.sustain)}%"></div>
+                            </div>
                         </div>
-                        <div class="metric-item">
-                            <span>BI:</span>
-                            <span class="metric-value ${sprint.productivity?.bi === null ? 'null' : ''}">
-                                ${formatValue(sprint.productivity?.bi)}
-                            </span>
-                        </div>
-                    </div>
-                </div> 
-                <!-- Acurácia 
-                <div class="metric-group">
-                    <h4><i class="fas fa-bullseye"></i> Acurácia</h4>
-                    <div class="metric-items">
-                        <div class="metric-item">
-                            <span>Fábrica:</span>
-                            <span class="metric-value ${sprint.accuracy?.factory === null ? 'null' : ''}">
-                                ${formatValue(sprint.accuracy?.factory)}
-                            </span>
-                        </div>
-                        <div class="metric-item">
-                            <span>Sustentação:</span>
-                            <span class="metric-value ${sprint.accuracy?.sustain === null ? 'null' : ''}">
-                                ${formatValue(sprint.accuracy?.sustain)}
-                            </span>
-                        </div>
-                        <div class="metric-item">
-                            <span>BI:</span>
-                            <span class="metric-value ${sprint.accuracy?.bi === null ? 'null' : ''}">
-                                ${formatValue(sprint.accuracy?.bi)}
-                            </span>
+                        <div class="metric-item-progress">
+                            <div class="metric-label">
+                                <span>BI</span>
+                                <span class="metric-percentage">${formatPercentage(sprint.productivity?.bi)}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${sprint.productivity?.bi === null ? 'null' : ''}" 
+                                     style="width: ${getProgressWidth(sprint.productivity?.bi)}%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                -->
+                
+                <div class="metric-group">
+                    <h4><i class="fas fa-bullseye"></i> Acurácia</h4>
+                    <div class="metric-items">
+                        <div class="metric-item-progress">
+                            <div class="metric-label">
+                                <span>Fábrica</span>
+                                <span class="metric-percentage">${formatPercentage(sprint.accuracy?.factory)}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${sprint.accuracy?.factory === null ? 'null' : ''}" 
+                                     style="width: ${getProgressWidth(sprint.accuracy?.factory)}%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-item-progress">
+                            <div class="metric-label">
+                                <span>Sustentação</span>
+                                <span class="metric-percentage">${formatPercentage(sprint.accuracy?.sustain)}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${sprint.accuracy?.sustain === null ? 'null' : ''}" 
+                                     style="width: ${getProgressWidth(sprint.accuracy?.sustain)}%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-item-progress">
+                            <div class="metric-label">
+                                <span>BI</span>
+                                <span class="metric-percentage">${formatPercentage(sprint.accuracy?.bi)}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${sprint.accuracy?.bi === null ? 'null' : ''}" 
+                                     style="width: ${getProgressWidth(sprint.accuracy?.bi)}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     `;
