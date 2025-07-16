@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-rocket"></i> Sprint Manager</h1>
+            <p>Gerencie seus dados de sprints de forma eficiente</p>
+        </header>
+
+        <!-- Barra de busca -->
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar por nome, assignee ID ou número da sprint...">
+                <button id="searchBtn" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <button id="clearSearchBtn" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Limpar
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulário de Sprint -->
+        <div class="form-section">
+            <h2 id="formTitle">
+                <i class="fas fa-plus"></i> Novo Sprint
+            </h2>
+            
+            <form id="sprintForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="assigneeId">
+                            <i class="fas fa-user"></i> Assignee ID *
+                        </label>
+                        <input type="text" id="assigneeId" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sprintName">
+                            <i class="fas fa-tag"></i> Nome *
+                        </label>
+                        <input type="text" id="sprintName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sprintNumber">
+                            <i class="fas fa-hashtag"></i> Número da Sprint *
+                        </label>
+                        <input type="number" id="sprintNumber" required>
+                    </div>
+                </div>
+
+                <div class="metrics-section">
+                    <h3><i class="fas fa-chart-line"></i> Produtividade</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productivityFactory">Factory</label>
+                            <input type="number" id="productivityFactory" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="productivitySustain">Sustain</label>
+                            <input type="number" id="productivitySustain" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="productivityBi">BI</label>
+                            <input type="number" id="productivityBi" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metrics-section">
+                    <h3><i class="fas fa-bullseye"></i> Acurácia</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="accuracyFactory">Factory</label>
+                            <input type="number" id="accuracyFactory" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="accuracySustain">Sustain</label>
+                            <input type="number" id="accuracySustain" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="accuracyBi">BI</label>
+                            <input type="number" id="accuracyBi" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <button type="button" id="cancelBtn" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista de Sprints -->
+        <div class="sprints-section">
+            <div class="section-header">
+                <h2><i class="fas fa-list"></i> Lista de Sprints</h2>
+                <button id="refreshBtn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Atualizar
+                </button>
+            </div>
+            
+            <div id="sprintsContainer">
+                <div id="loadingSpinner" class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando...
+                </div>
+                <div id="sprintsList"></div>
+                <div id="noSprintsMessage" class="no-data" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <p>Nenhum sprint encontrado</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja excluir este sprint?</p>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Excluir
+                </button>
+                <button id="cancelDeleteBtn" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast para notificações -->
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
