@@ -399,7 +399,11 @@ function createSprintCard(sprint) {
             <div class="sprint-header">
                 <div class="sprint-info">
                     <h3><i class="fas fa-rocket"></i> ${sprint.name}</h3>
-                    <p><strong>Sprint:</strong> ${sprint.sprint} | <strong>Responsável:</strong> ${sprint.assignee_id}</p>
+                    <p><strong>Sprint:</strong> ${sprint.sprint} | <strong>Responsável:</strong> ${sprint.assignee_id} 
+                        <button class="btn-copy" onclick="copyToClipboard('${sprint.assignee_id}')" title="Copiar Assignee ID">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </p>
                 </div>
                 <div class="sprint-actions">
                     <button class="btn btn-edit" onclick="handleEdit('${sprint._id}')">
@@ -474,6 +478,16 @@ function showLoading() {
 function hideLoading() {
     elements.loadingSpinner.style.display = 'none';
     elements.sprintsList.style.display = 'block';
+}
+
+// Função para copiar texto para a área de transferência
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast(`Assignee ID copiado: ${text}`, 'success');
+    }).catch((err) => {
+        console.error('Erro ao copiar para a área de transferência:', err);
+        showToast('Erro ao copiar texto', 'error');
+    });
 }
 
 function showToast(message, type = 'info') {
