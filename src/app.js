@@ -37,6 +37,16 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+// Rota para configurações do frontend
+app.get('/api/config', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      defaultAssigneeId: process.env.DEFAULT_ASSIGNEE_ID
+    }
+  });
+});
+
 // Rota raiz
 app.get('/', (req, res) => {
   res.json({

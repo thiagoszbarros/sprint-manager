@@ -65,6 +65,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
     initializeTabs();
     loadSprints();
+    
+    // Configurar valor padrão para o dashboard
+    initializeDefaultDashboard();
 });
 
 // Event Listeners
@@ -541,12 +544,37 @@ function showToast(message, type = 'info') {
 
 // === DASHBOARD FUNCTIONS ===
 
+async function fetchDefaultAssigneeId() {
+    try {
+        const response = await apiRequest('/config');
+        return response.data.defaultAssigneeId;
+    } catch (error) {
+        console.error('Erro ao buscar configuração padrão:', error);
+        throw error;
+    }
+}
+
+function initializeDefaultDashboard() {
+    // Buscar o Assignee ID padrão da configuração da API
+    fetchDefaultAssigneeId().then(defaultAssigneeId => {
+        if (elements.dashboardAssigneeId && defaultAssigneeId) {
+            elements.dashboardAssigneeId.value = defaultAssigneeId;
+            // Carregar o dashboard automaticamente
+            setTimeout(() => {
+                loadDashboard();
+            }, 500); // Pequeno delay para garantir que a página esteja totalmente carregada
+        }
+    }).catch(error => {
+        console.error('Erro ao buscar Assignee ID padrão:', error);
+    });
+}
+
 function initializeTabs() {
     // Verificar se todos os elementos existem antes de configurar as abas
     if (elements.dashboardTab && elements.manageTab && 
         elements.dashboardSection && elements.manageSection) {
-        // Iniciar com a aba de gerenciamento para testar o CRUD
-        switchTab('manage');
+        // Iniciar com a aba do dashboard
+        switchTab('dashboard');
     } else {
         console.error('Elementos de navegação não encontrados');
     }
