@@ -672,7 +672,7 @@ function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
     lastTwoSprints.forEach((sprint, index) => {
         const sprintLabel = `Sprint ${sprint.sprint}`;
         const productivityColor = index === 0 ? 'rgba(102, 126, 234, 0.8)' : 'rgba(118, 75, 162, 0.8)';
-        const accuracyColor = index === 0 ? 'rgba(102, 126, 234, 0.4)' : 'rgba(118, 75, 162, 0.4)';
+        // const accuracyColor = index === 0 ? 'rgba(102, 126, 234, 0.4)' : 'rgba(118, 75, 162, 0.4)';
         
         // Produtividade
         datasets.push({
@@ -687,8 +687,8 @@ function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
             borderWidth: 2
         });
         
-        // Acurácia
-        datasets.push({
+        // Acurácia - COMENTADO
+        /* datasets.push({
             label: `${sprintLabel} - Acurácia`,
             data: [
                 sprint.accuracy?.factory || 0,
@@ -698,7 +698,7 @@ function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
             backgroundColor: accuracyColor,
             borderColor: accuracyColor.replace('0.4', '1'),
             borderWidth: 2
-        });
+        }); */
     });
     
     lastTwoSprintsChart = new Chart(ctx, {
@@ -740,8 +740,9 @@ function createGlobalChart(globalAverages, commonOptions) {
                     backgroundColor: 'rgba(102, 126, 234, 0.8)',
                     borderColor: 'rgba(102, 126, 234, 1)',
                     borderWidth: 2
-                },
-                {
+                }
+                // Acurácia Média - COMENTADO
+                /* ,{
                     label: 'Acurácia Média',
                     data: [
                         globalAverages.accuracy.factory,
@@ -751,7 +752,7 @@ function createGlobalChart(globalAverages, commonOptions) {
                     backgroundColor: 'rgba(118, 75, 162, 0.8)',
                     borderColor: 'rgba(118, 75, 162, 1)',
                     borderWidth: 2
-                }
+                } */
             ]
         },
         options: {
