@@ -792,9 +792,9 @@ function createlastThreeSprintsChart(lastThreeSprints, commonOptions) {
 
 function createGlobalChart(globalAverages, commonOptions) {
     const ctx = document.getElementById('globalChart').getContext('2d');
-    
-    const labels = ['Factory', 'Sustain', 'BI'];
-    
+
+    const labels = ['Fábrica', 'Sustentação', 'BI'];
+
     globalChart = new Chart(ctx, {
         type: 'bar',
         data: {
