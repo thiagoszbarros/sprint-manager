@@ -674,7 +674,15 @@ function createlastThreeSprintsChart(lastThreeSprints, commonOptions) {
     
     reversedSprints.forEach((sprint, index) => {
         const sprintLabel = `Sprint ${sprint.sprint}`;
-        const productivityColor = index === 0 ? 'rgba(102, 126, 234, 0.8)' : 'rgba(118, 75, 162, 0.8)';
+        // Definir 3 cores diferentes para as sprints
+        let productivityColor;
+        if (index === 0) {
+            productivityColor = 'rgba(102, 126, 234, 0.8)';
+        } else if (index === 1) {
+            productivityColor = 'rgba(167, 34, 197, 0.8)';  
+        } else {
+            productivityColor = 'rgba(193, 239, 68, 0.8)';
+        }
         // const accuracyColor = index === 0 ? 'rgba(102, 126, 234, 0.4)' : 'rgba(118, 75, 162, 0.4)';
         
         // Produtividade
