@@ -670,7 +670,7 @@ function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
     const datasets = [];
     
     lastTwoSprints.forEach((sprint, index) => {
-        const sprintLabel = `Sprint ${sprint.sprintNumber}`;
+        const sprintLabel = `Sprint ${sprint.sprint}`;
         const productivityColor = index === 0 ? 'rgba(102, 126, 234, 0.8)' : 'rgba(118, 75, 162, 0.8)';
         const accuracyColor = index === 0 ? 'rgba(102, 126, 234, 0.4)' : 'rgba(118, 75, 162, 0.4)';
         

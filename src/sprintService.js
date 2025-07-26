@@ -237,10 +237,15 @@ class SprintService {
         throw new Error('Nenhum sprint encontrado para este assignee');
       }
 
-      // Ordenar por número da sprint (assumindo que números maiores são mais recentes)
-      const sortedSprints = allSprints.sort((a, b) => b.sprintNumber - a.sprintNumber);
+      // Ordenar por _id (que contém timestamp de criação) para pegar as sprints mais recentes
+      const sortedSprints = allSprints.sort((a, b) => {
+        // Converter ObjectId para timestamp para comparação
+        const aTime = a._id.getTimestamp().getTime();
+        const bTime = b._id.getTimestamp().getTime();
+        return bTime - aTime; // Ordem decrescente (mais recente primeiro)
+      });
       
-      // Pegar as últimas 2 sprints
+      // Pegar as últimas 2 sprints (mais recentes)
       const lastTwoSprints = sortedSprints.slice(0, 2);
       
       // Calcular médias globais
