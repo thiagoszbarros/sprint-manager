@@ -845,7 +845,7 @@ async function getDashboardData(assigneeId) {
 // Função para verificar se a API está disponível
 async function checkAPIStatus() {
     try {
-        await fetch(`${API_BASE_URL.replace('/api', '')}/api/status`);
+        await fetch(`${API_BASE_URL}/status`);
         return true;
     } catch (error) {
         showToast('Erro: API não está disponível. Verifique se o servidor está rodando.', 'error');
