@@ -665,11 +665,14 @@ function createCharts(data) {
 function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
     const ctx = document.getElementById('lastTwoSprintsChart').getContext('2d');
     
-    // Preparar dados
+    // Preparar dados - inverter ordem para que a mais recente apareça à direita
     const labels = ['Fábrica', 'Sustentação', 'BI'];
     const datasets = [];
     
-    lastTwoSprints.forEach((sprint, index) => {
+    // Inverter a ordem das sprints para que a mais recente apareça à direita
+    const reversedSprints = [...lastTwoSprints].reverse();
+    
+    reversedSprints.forEach((sprint, index) => {
         const sprintLabel = `Sprint ${sprint.sprint}`;
         const productivityColor = index === 0 ? 'rgba(102, 126, 234, 0.8)' : 'rgba(118, 75, 162, 0.8)';
         // const accuracyColor = index === 0 ? 'rgba(102, 126, 234, 0.4)' : 'rgba(118, 75, 162, 0.4)';
