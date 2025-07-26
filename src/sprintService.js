@@ -246,13 +246,13 @@ class SprintService {
       });
       
       // Pegar as últimas 2 sprints (mais recentes)
-      const lastTwoSprints = sortedSprints.slice(0, 2);
+      const lastThreeSprints = sortedSprints.slice(0, 3);
       
       // Calcular médias globais
       const globalAverages = this.calculateGlobalAverages(allSprints);
       
       return {
-        lastTwoSprints,
+        lastThreeSprints,
         globalAverages,
         totalSprints: allSprints.length,
         assigneeId

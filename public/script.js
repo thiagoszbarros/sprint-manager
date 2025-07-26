@@ -4,7 +4,7 @@ const API_BASE_URL = 'http://localhost:3000/api';
 // Estado da aplicação
 let currentEditingId = null;
 let sprints = [];
-let lastTwoSprintsChart = null;
+let lastThreeSprintsChart = null;
 let globalChart = null;
 
 // Elementos DOM
@@ -626,8 +626,8 @@ function updateStats(data) {
 
 function createCharts(data) {
     // Destruir gráficos existentes
-    if (lastTwoSprintsChart) {
-        lastTwoSprintsChart.destroy();
+    if (lastThreeSprintsChart) {
+        lastThreeSprintsChart.destroy();
     }
     if (globalChart) {
         globalChart.destroy();
@@ -656,21 +656,21 @@ function createCharts(data) {
     };
     
     // Gráfico das últimas 2 sprints
-    createLastTwoSprintsChart(data.lastTwoSprints, commonOptions);
+    createlastThreeSprintsChart(data.lastThreeSprints, commonOptions);
     
     // Gráfico global
     createGlobalChart(data.globalAverages, commonOptions);
 }
 
-function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
-    const ctx = document.getElementById('lastTwoSprintsChart').getContext('2d');
+function createlastThreeSprintsChart(lastThreeSprints, commonOptions) {
+    const ctx = document.getElementById('lastThreeSprintsChart').getContext('2d');
     
     // Preparar dados - inverter ordem para que a mais recente apareça à direita
     const labels = ['Fábrica', 'Sustentação', 'BI'];
     const datasets = [];
     
     // Inverter a ordem das sprints para que a mais recente apareça à direita
-    const reversedSprints = [...lastTwoSprints].reverse();
+    const reversedSprints = [...lastThreeSprints].reverse();
     
     reversedSprints.forEach((sprint, index) => {
         const sprintLabel = `Sprint ${sprint.sprint}`;
@@ -704,7 +704,7 @@ function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
         }); */
     });
     
-    lastTwoSprintsChart = new Chart(ctx, {
+    lastThreeSprintsChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
@@ -716,7 +716,7 @@ function createLastTwoSprintsChart(lastTwoSprints, commonOptions) {
                 ...commonOptions.plugins,
                 title: {
                     display: true,
-                    text: 'Comparação das Últimas 2 Sprints'
+                    text: 'Comparação das Últimas Sprints'
                 }
             }
         }
