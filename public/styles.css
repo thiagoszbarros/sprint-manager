@@ -101,6 +101,18 @@ header p {
     font-size: 2rem;
 }
 
+.assignee-name {
+    color: #667eea;
+    font-size: 2rem;
+    font-weight: inherit;
+    margin-left: 10px;
+    display: none;
+}
+
+.assignee-name.visible {
+    display: inline;
+}
+
 .assignee-selector {
     margin-bottom: 30px;
 }

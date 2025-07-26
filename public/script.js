@@ -35,6 +35,7 @@ const elements = {
     loadDashboardBtn: document.getElementById('loadDashboardBtn'),
     chartsContainer: document.getElementById('chartsContainer'),
     emptyDashboard: document.getElementById('emptyDashboard'),
+    assigneeNameDisplay: document.getElementById('assigneeNameDisplay'),
     totalSprintsCount: document.getElementById('totalSprintsCount'),
     avgProductivity: document.getElementById('avgProductivity'),
     avgAccuracy: document.getElementById('avgAccuracy')
@@ -42,8 +43,6 @@ const elements = {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded');
-    
     // Verificar se todos os elementos críticos existem
     const criticalElements = [
         'dashboardTab', 'manageTab', 
@@ -96,6 +95,13 @@ function initializeEventListeners() {
     elements.dashboardAssigneeId.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             loadDashboard();
+        }
+    });
+
+    // Ocultar nome do responsável quando o campo for limpo
+    elements.dashboardAssigneeId.addEventListener('input', function(e) {
+        if (!e.target.value.trim() && elements.assigneeNameDisplay) {
+            elements.assigneeNameDisplay.classList.remove('visible');
         }
     });
 
@@ -555,6 +561,11 @@ async function fetchDefaultAssigneeId() {
 }
 
 function initializeDefaultDashboard() {
+    // Garantir que o nome do responsável comece oculto
+    if (elements.assigneeNameDisplay) {
+        elements.assigneeNameDisplay.classList.remove('visible');
+    }
+    
     // Buscar o Assignee ID padrão da configuração da API
     fetchDefaultAssigneeId().then(defaultAssigneeId => {
         if (elements.dashboardAssigneeId && defaultAssigneeId) {
@@ -591,6 +602,11 @@ function switchTab(tab) {
         if (elements.dashboardTab) elements.dashboardTab.classList.remove('active');
         if (elements.manageSection) elements.manageSection.classList.add('active');
         if (elements.dashboardSection) elements.dashboardSection.classList.remove('active');
+        
+        // Limpar o nome do responsável quando sair do dashboard
+        if (elements.assigneeNameDisplay) {
+            elements.assigneeNameDisplay.classList.remove('visible');
+        }
     }
 }
 
@@ -606,11 +622,22 @@ async function loadDashboard() {
         elements.emptyDashboard.style.display = 'none';
         elements.chartsContainer.style.display = 'none';
         
+        // Esconder o nome do responsável durante o carregamento
+        if (elements.assigneeNameDisplay) {
+            elements.assigneeNameDisplay.classList.remove('visible');
+        }
+        
         // Mostrar loading
         showToast('Carregando dados do dashboard...', 'info');
         
         const response = await apiRequest(`/sprints/dashboard/${assigneeId}`);
         const data = response.data;
+        
+        // Atualizar o nome do responsável no título
+        if (elements.assigneeNameDisplay) {
+            elements.assigneeNameDisplay.textContent = `- ${response.data.lastThreeSprints[0].name}`;
+            elements.assigneeNameDisplay.classList.add('visible');
+        }
         
         // Atualizar estatísticas
         //updateStats(data);
@@ -628,6 +655,11 @@ async function loadDashboard() {
         showToast(error.message || 'Erro ao carregar dashboard', 'error');
         elements.emptyDashboard.style.display = 'block';
         elements.chartsContainer.style.display = 'none';
+        
+        // Esconder o nome do responsável em caso de erro
+        if (elements.assigneeNameDisplay) {
+            elements.assigneeNameDisplay.classList.remove('visible');
+        }
     }
 }
 
