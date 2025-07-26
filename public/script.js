@@ -415,7 +415,6 @@ function displaySprints(sprintsToShow) {
 }
 
 function createSprintCard(sprint) {
-    const formatValue = (value) => value !== null && value !== undefined ? value : 'N/A';
     const formatPercentage = (value) => value !== null && value !== undefined ? `${value}%` : 'N/A';
     const getProgressWidth = (value) => value !== null && value !== undefined ? value : 0;
     
