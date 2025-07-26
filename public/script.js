@@ -585,7 +585,7 @@ async function loadDashboard() {
         const data = response.data;
         
         // Atualizar estatísticas
-        updateStats(data);
+        //updateStats(data);
         
         // Criar gráficos
         createCharts(data);
